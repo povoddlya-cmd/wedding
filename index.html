@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alex & Maya — Wedding Fest 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+body{background:#F5EBDD;color:#3B2A22;font-family:Inter,sans-serif;margin:0;overflow-x:hidden}
+.no-sb::-webkit-scrollbar{display:none}
+</style>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={theme:{extend:{colors:{terra:'#C4623E',sand:'#F5EBDD',peach:'#F6C5A4',sage:'#8A9A7B',ink:'#3B2A22'},fontFamily:{serif:['"Playfair Display"','serif'],sans:['Inter','sans-serif']}}}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+const GAS_URL="https://script.google.com/macros/s/AKfycbyNy-vpyY5ATvoGNn-IgplxR22zULJ0aPwTW1hNmVa4xi9-g8SiNnFmGZyWCszP6Ysa/exec"; // див. інструкцію
+
+const P={menu:"M4 6h16M4 12h16M4 18h16",x:"M6 6l12 12M18 6L6 18",gift:"M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 110-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 100-5C13 2 12 7 12 7z",pin:"M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1116 0zM12 7a3 3 0 100 6 3 3 0 000-6z",check:"M20 6L9 17l-5-5",cal:"M3 4h18v18H3zM16 2v4M8 2v4M3 10h18",flame:"M12 2c1 4 6 6 6 12a6 6 0 01-12 0c0-3 2-4 3-6 1 2 3 2 3-6z"};
+const Icon=({n,c="w-5 h-5"})=><svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={P[n]}/></svg>;
+
+/* scroll-reveal (IntersectionObserver) */
+function Reveal({children,className="",delay=0}){
+  const r=useRef(null);const [v,setV]=useState(false);
+  useEffect(()=>{const o=new IntersectionObserver(([e])=>{if(e.isIntersecting){setV(true);o.disconnect()}},{threshold:.15});o.observe(r.current);return()=>o.disconnect()},[]);
+  return <div ref={r} style={{transitionDelay:delay+"ms"}} className={`transition-all duration-700 ease-out ${v?"opacity-100 translate-y-0":"opacity-0 translate-y-8"} ${className}`}>{children}</div>;
+}
+const Title=({k,children})=><Reveal className="text-center mb-10 md:mb-16"><p className="text-xs tracking-[.3em] text-terra font-semibold mb-3">{k}</p><h2 className="font-serif text-4xl md:text-5xl font-bold">{children}</h2></Reveal>;
+const Sec=({id,children,className=""})=><section id={id} className={`px-5 md:px-10 py-16 md:py-28 ${className}`}><div className="max-w-6xl mx-auto">{children}</div></section>;
+
+const links=[["Програма","#lineup"],["Дрес-код","#dress"],["Подарунки","#gifts"],["RSVP","#rsvp"]];
+function Nav(){
+  const [o,setO]=useState(false);const [s,setS]=useState(false);
+  useEffect(()=>{const f=()=>setS(scrollY>40);f();addEventListener("scroll",f);return()=>removeEventListener("scroll",f)},[]);
+  return <header className={`fixed inset-x-0 top-0 z-50 transition-all ${s||o?"bg-sand/85 backdrop-blur-md shadow-sm":""}`} style={{paddingTop:"env(safe-area-inset-top,0px)"}}>
+    <div className="max-w-6xl mx-auto flex items-center justify-between px-5 md:px-10 h-16">
+      <a href="#top" className="font-serif text-xl font-bold">A <span className="text-terra">&</span> M</a>
+      <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+        {links.map(([t,h])=><a key={h} href={h} className="hover:text-terra transition-colors">{t}</a>)}
+        <a href="#rsvp" className="bg-terra text-white px-5 py-2.5 rounded-full hover:scale-105 hover:shadow-md transition">Я буду</a>
+      </nav>
+      <button aria-label="Меню" className="md:hidden p-2 -mr-2" onClick={()=>setO(!o)}><Icon n={o?"x":"menu"} c="w-7 h-7"/></button>
+    </div>
+    {o&&<nav className="md:hidden flex flex-col px-5 pb-6 gap-1">
+      {links.map(([t,h])=><a key={h} href={h} onClick={()=>setO(false)} className="py-4 text-lg font-serif border-b border-ink/10">{t}</a>)}
+    </nav>}
+  </header>;
+}
+
+const target=new Date("2026-08-22T15:00:00+03:00");
+function useCountdown(){
+  const calc=()=>{const d=Math.max(0,target-new Date());return{Днів:Math.floor(d/864e5),Годин:Math.floor(d/36e5)%24,Хвилин:Math.floor(d/6e4)%60}};
+  const [t,setT]=useState(calc);useEffect(()=>{const i=setInterval(()=>setT(calc()),1000);return()=>clearInterval(i)},[]);return t;
+}
+function Hero(){
+  const t=useCountdown();
+  return <section id="top" className="relative min-h-screen flex items-center justify-center text-center px-5 text-white overflow-hidden" style={{background:"linear-gradient(160deg,#C4623E 0%,#E08A5E 45%,#F6C5A4 100%)"}}>
+    <div className="absolute -bottom-32 -left-24 w-96 h-96 rounded-full bg-sage/40 blur-3xl"/><div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-peach/50 blur-3xl"/>
+    <div className="relative max-w-3xl pt-16">
+      <p className="tracking-[.35em] text-xs md:text-sm font-semibold mb-6">WEDDING FEST 2026</p>
+      <h1 className="font-serif font-bold text-6xl sm:text-7xl md:text-9xl leading-none">Alex <span className="italic font-medium">&</span> Maya</h1>
+      <p className="mt-8 tracking-[.2em] text-sm md:text-lg font-medium">22 СЕРПНЯ 2026 • ОДЕСА</p>
+      <div className="mt-10 flex justify-center gap-3 md:gap-5">
+        {Object.entries(t).map(([k,v])=><div key={k} className="w-24 md:w-32 py-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-sm"><div className="font-serif text-4xl md:text-5xl font-bold">{String(v).padStart(2,"0")}</div><div className="text-[11px] md:text-xs tracking-widest uppercase mt-1">{k}</div></div>)}
+      </div>
+      <a href="#rsvp" className="inline-block mt-12 w-full sm:w-auto bg-white text-terra font-semibold text-lg px-10 py-5 rounded-full shadow-md md:hover:scale-105 md:hover:shadow-[0_0_40px_rgba(255,255,255,.6)] transition duration-300">Підтвердити присутність</a>
+    </div>
+  </section>;
+}
+
+function About(){
+  return <Sec id="about"><div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+    <Reveal><p className="text-xs tracking-[.3em] text-terra font-semibold mb-3">КОНЦЕПЦІЯ</p>
+      <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6">Не банкет. Фестиваль.</h2>
+      <p className="text-lg leading-relaxed text-ink/80">Жодних довгих столів і нудних тостів. Ми збираємо друзів і родину просто неба: босоніж по траві, з живою музикою, вогнем мангала та заходом сонця над морем.</p>
+      <p className="text-lg leading-relaxed text-ink/80 mt-4">Приходьте налегке, беріть гарний настрій — решту ми підготували самі.</p></Reveal>
+    <Reveal delay={150}><div className="aspect-[4/5] md:aspect-square rounded-2xl shadow-md flex items-end p-6 text-white hover:shadow-lg transition" style={{background:"linear-gradient(200deg,#8A9A7B,#C4623E 70%,#F6C5A4)"}}><p className="font-serif italic text-2xl">Захід сонця, море, музика<br/>і всі, кого ми любимо</p></div></Reveal>
+  </div></Sec>;
+}
+
+const lineup=[["15:00","Welcome","Зустріч гостей, лимонади та легкі закуски на галявині"],["16:30","Церемонія","Клятви під аркою з пампаса та сухоцвітів"],["18:00","BBQ","Гриль, місцеві вина та довгий спільний стіл"],["20:00","DJ Set","Танці до останнього променя на сцені біля моря"],["23:00","Багаття","Теплі пледи, гітара та історії біля вогню"]];
+function Lineup(){
+  return <Sec id="lineup" className="bg-peach/30"><Title k="LINE-UP">Програма фестивалю</Title>
+    <div className="relative">
+      <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-terra/40 md:-translate-x-1/2"/>
+      {lineup.map(([t,h,d],i)=><Reveal key={t} className={`relative pl-12 md:pl-0 mb-8 md:mb-10 md:w-1/2 ${i%2?"md:ml-auto md:pl-12":"md:pr-12"}`}>
+        <span className={`absolute left-[9px] md:left-auto top-6 w-3.5 h-3.5 rounded-full bg-terra ring-4 ring-sand ${i%2?"md:-left-[7px]":"md:-right-[7px]"}`}/>
+        <div className="bg-white/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition">
+          <span className="text-terra font-bold tracking-widest text-sm">{t}</span>
+          <h3 className="font-serif text-2xl font-bold mt-1">{h}</h3><p className="text-ink/70 mt-2">{d}</p></div>
+      </Reveal>)}
+    </div></Sec>;
+}
+
+const colors=[["#C4623E","Теракота"],["#E8B796","Персик"],["#F5EBDD","Пісочний"],["#8A9A7B","Шавлія"],["#B8864B","Охра"],["#6E7F5E","Оливковий"]];
+const looks=[["Для неї","Легка лляна сукня міді, плетені сандалі"],["Для нього","Лляна сорочка, світлі штани, лофери"],["Аксесуари","Солом'яний капелюх, тонке золото, хустка"],["Взуття","Зручне: трава й пісок — найкращі друзі"]];
+function Dress(){
+  const [c,setC]=useState(colors[0]);
+  return <Sec id="dress"><Title k="DRESS CODE">Festival Chic / Smart Casual</Title>
+    <Reveal className="text-center mb-12">
+      <div className="flex justify-center flex-wrap gap-4">{colors.map(x=><button key={x[0]} aria-label={x[1]} onMouseEnter={()=>setC(x)} onClick={()=>setC(x)} style={{background:x[0]}} className={`w-14 h-14 md:w-16 md:h-16 rounded-full shadow-sm hover:scale-110 hover:shadow-md transition border-2 ${c[0]===x[0]?"border-ink":"border-white"}`}/>)}</div>
+      <p className="font-serif text-2xl mt-5 h-8">{c[1]}</p></Reveal>
+    <div className="flex md:grid md:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory no-sb -mx-5 px-5 md:mx-0 md:px-0">
+      {looks.map(([h,d],i)=><div key={h} className="snap-center shrink-0 w-[78%] sm:w-[55%] md:w-auto bg-white/70 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition overflow-hidden">
+        <div className="h-40" style={{background:`linear-gradient(135deg,${colors[i][0]},${colors[(i+3)%6][0]})`}}/>
+        <div className="p-5"><h3 className="font-serif text-xl font-bold">{h}</h3><p className="text-sm text-ink/70 mt-2">{d}</p></div></div>)}
+    </div></Sec>;
+}
+
+const gifts=[["Подорож","Медовий місяць удвох","10 000 ₴"],["Набір для пікніка","Кошик, плед, посуд","2 500 ₴"],["Винний холодильник","Для улюблених вин","7 000 ₴"],["Полароїд","Камера та 10 картриджів","3 500 ₴"],["Кавомашина","Для затишних ранків","12 000 ₴"],["Свій варіант","Будь-який внесок у наш спільний фонд","будь-яка сума"]];
+function Gifts(){
+  const [b,setB]=useState({});
+  return <Sec id="gifts" className="bg-peach/30"><Title k="WISHLIST">Що нас потішить</Title>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+      {gifts.map(([h,d,p],i)=><Reveal key={h} delay={i%3*100}><div className="h-full flex flex-col bg-white/80 rounded-2xl p-6 shadow-sm hover:shadow-md hover:-translate-y-1 transition">
+        <div className="w-12 h-12 rounded-full bg-peach text-terra flex items-center justify-center mb-4"><Icon n="gift"/></div>
+        <h3 className="font-serif text-xl font-bold">{h}</h3><p className="text-ink/70 mt-1 flex-1">{d}</p>
+        <p className="text-terra font-semibold mt-3">{p}</p>
+        <button onClick={()=>setB({...b,[i]:!b[i]})} className={`mt-4 w-full py-3.5 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${b[i]?"bg-sage text-white":"bg-terra text-white hover:bg-terra/90"}`}>{b[i]?<><Icon n="check" c="w-4 h-4"/>Заброньовано</>:"Забронювати"}</button></div></Reveal>)}
+    </div></Sec>;
+}
+
+function Rsvp(){
+  const [st,setSt]=useState("idle");const [reply,setReply]=useState("");
+  const f="w-full bg-sand rounded-xl px-4 py-4 outline-none focus:ring-2 focus:ring-terra";
+  const send=async e=>{e.preventDefault();setSt("sending");
+    const d=Object.fromEntries(new FormData(e.target));
+    try{
+      if(!d.website)await fetch(GAS_URL,{method:"POST",mode:"no-cors",headers:{"content-type":"text/plain"},body:JSON.stringify(d)});
+      setReply((d.attending==="no"?`Шкода, що не зможете, ${d.name}. Дякуємо, що повідомили!`:`Дякуємо, ${d.name}! Ми записали вас і чекаємо на фестивалі 💛`)+(d.note?" Ваше повідомлення передано організаторам.":""));setSt("done");
+    }catch{setSt("error")}};
+  return <Sec id="rsvp"><Reveal><div className="max-w-3xl mx-auto bg-white/80 rounded-2xl shadow-md p-6 md:p-12">
+    <h2 className="font-serif text-4xl font-bold text-center">RSVP</h2><p className="text-center text-ink/70 mt-2 mb-8">Дайте відповідь, будь ласка, до 1 серпня</p>
+    {st==="done"?<div className="text-center py-10"><div className="w-16 h-16 mx-auto rounded-full bg-sage text-white flex items-center justify-center mb-4"><Icon n="check" c="w-8 h-8"/></div><p className="font-serif text-2xl">{reply}</p></div>
+    :<form onSubmit={send} className="grid md:grid-cols-2 gap-4 md:gap-5">
+      <input name="website" tabIndex="-1" autoComplete="off" className="hidden"/>
+      <input name="name" required placeholder="Ім'я" className={f}/><input name="surname" required placeholder="Прізвище" className={f}/>
+      <select name="attending" className={f} defaultValue="yes"><option value="yes">Буду</option><option value="no">На жаль, не зможу</option></select>
+      <select name="drink" className={f} defaultValue="Вино"><option>Вино</option><option>Крафтове пиво</option><option>Міцне</option><option>Безалкогольне</option></select>
+      <textarea name="note" placeholder="Алергії, питання чи побажання" rows="3" className={f+" md:col-span-2"}/>
+      {st==="error"&&<p className="md:col-span-2 text-terra text-center">Не вдалося надіслати. Спробуйте ще раз або напишіть організатору.</p>}
+      <button disabled={st==="sending"} className="md:col-span-2 bg-terra text-white text-lg font-semibold py-5 rounded-xl hover:shadow-md md:hover:scale-[1.02] transition disabled:opacity-60">{st==="sending"?"Надсилаємо…":"Надіслати"}</button>
+    </form>}
+  </div></Reveal></Sec>;
+}
+
+function Footer(){
+  return <footer className="bg-ink text-sand px-5 md:px-10 pt-16 pb-10">
+    <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
+      <div><p className="text-xs tracking-[.3em] text-peach font-semibold mb-3">ЛОКАЦІЯ</p>
+        <h3 className="font-serif text-3xl font-bold flex items-center gap-2"><Icon n="pin" c="w-7 h-7 text-peach"/>Beach Club «Sunset»</h3>
+        <p className="mt-3 text-sand/80">Одеса, Приморський район, вул. Приморська, 12</p>
+        <div className="flex flex-wrap gap-3 mt-5">
+          <a href="https://www.openstreetmap.org/search?query=Одеса+Приморська+12" target="_blank" rel="noopener" className="px-5 py-3 rounded-full bg-terra hover:scale-105 transition">OpenStreetMap</a>
+          <a href="https://www.google.com/maps/search/?api=1&query=Одеса+Приморська+12" target="_blank" rel="noopener" className="px-5 py-3 rounded-full border border-sand/40 hover:bg-sand/10 transition">Google Maps</a></div></div>
+      <div className="md:text-right"><p className="text-xs tracking-[.3em] text-peach font-semibold mb-3">ОРГАНІЗАТОР</p>
+        <p className="font-serif text-3xl font-bold text-peach">#AlexAndMayaFest</p>
+        <p className="mt-3 text-sand/80">Анна • +380 00 000 00 00<br/>wedding@example.com</p></div>
+    </div>
+    <p className="max-w-6xl mx-auto mt-12 pt-6 border-t border-sand/20 text-sm text-sand/50 flex items-center gap-2"><Icon n="flame" c="w-4 h-4"/>Alex & Maya • 2026</p>
+  </footer>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<><Nav/><Hero/><About/><Lineup/><Dress/><Gifts/><Rsvp/><Footer/></>);
+</script>
+</body>
+</html>
